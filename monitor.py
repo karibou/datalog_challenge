@@ -25,10 +25,10 @@ if __name__ == '__main__':
 
     try:
         parser = argparse.ArgumentParser()
-        parser.add_argument('-f','--filename', nargs=1, metavar='LOGFILE',
+        parser.add_argument('-f', '--filename', nargs=1, metavar='LOGFILE',
                             default='./mylogfile.log',
                             help='Path to logfile to monitor')
-        parser.add_argument('-t','--time', nargs=1, metavar='TIME DELAY',
+        parser.add_argument('-t', '--time', nargs=1, metavar='TIMEDELAY',
                             default=10, type=int,
                             help='Time delay between updates')
         args = parser.parse_args()
