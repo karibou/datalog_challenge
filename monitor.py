@@ -5,21 +5,28 @@ import time
 import argparse
 
 
-def scan_log(logfile, lines):
-    lines += ['scanning %s' % logfile]
+class Monitor():
+    def __init__(self, logfile):
+        self.log = logfile
+        self.lines_to_print = []
 
-def redraw_screen(lines):
-    for line in lines:
-        print('%s'% line)
+    def scan_log(self):
+        self.lines_to_print += ['scanning %s' % self.log]
+
+    def redraw_screen(self):
+        for line in self.lines_to_print:
+            print('%s' % line)
+
 
 def main():
 
-    lines_to_print = []
+    monitor = Monitor(LogFile)
 
     while True:
         time.sleep(Delay)
-        scan_log(LogFile, lines_to_print)
-        redraw_screen(lines_to_print)
+        monitor.scan_log()
+        monitor.redraw_screen()
+
 
 if __name__ == '__main__':
 
@@ -33,7 +40,7 @@ if __name__ == '__main__':
                             help='Time delay between updates')
         args = parser.parse_args()
 
-        LogFile = args.filename[0]
+        LogFile = args.filename
         Delay = args.time[0]
 
         main()
