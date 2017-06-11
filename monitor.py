@@ -31,7 +31,7 @@ class Monitor():
         try:
             self.log = open(self.logname, 'r')
             # Go to EOF
-            self.log.seek(0,2)
+            self.log.seek(0, 2)
         except FileNotFoundError as e:
             print('Cannot open file : %s' % e)
             raise
@@ -133,22 +133,22 @@ def main():
 if __name__ == '__main__':
 
         parser = argparse.ArgumentParser()
-        parser.add_argument('-f', '--filename', nargs=1, metavar='LOGFILE',
-                            default='./mylogfile.log',
+        parser.add_argument('-f', '--filename', metavar='LOGFILE',
+                            default='./mylogfile.log', type=str,
                             help='Path to logfile to monitor')
-        parser.add_argument('-t', '--time', nargs=1, metavar='TIMEDELAY',
-                            default=[10], type=int,
+        parser.add_argument('-t', '--time', metavar='TIMEDELAY',
+                            default=10, type=int,
                             help='Time delay between updates')
-        parser.add_argument('-a', '--alert', nargs=1, metavar='ALERT_LIMIT',
-                            default=[200],
+        parser.add_argument('-a', '--alert', metavar='ALERT_LIMIT',
+                            type=float, default=100.0,
                             help='Hits/min alert threshold')
         parser.add_argument('-c', '--cumulative', action='store_true',
                             help='Print cumulative section hits')
         args = parser.parse_args()
 
         LogFile = args.filename
-        Delay = args.time[0]
-        Alert = float(args.alert[0])
+        Delay = args.time
+        Alert = args.alert
         Cumulative = args.cumulative
 
         main()
