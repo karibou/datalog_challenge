@@ -3,6 +3,7 @@
 import sys
 import time
 import argparse
+import re
 
 from datetime import datetime
 
@@ -25,6 +26,9 @@ class Monitor():
         self.two_min_hits = []
         self.one_min_ave = 0.0
         self.stats = {'new_lines': 0, 'total_lines': 0, 'unique_ip': set()}
+        self.ip_regex = re.compile(r'^.* - -')
+        self.uri_regex = re.compile(r'\"*\"')
+        self.section_regex = re.compile(r'\s+')
 
     def open_logfile(self, logfile):
         self.logname = logfile
@@ -46,25 +50,32 @@ class Monitor():
             self.top_section_hits = {}
 
         for line in self.log.readlines():
-            fields = line.split()
             # Get some useful statistics
-            self.stats['unique_ip'].add(fields[0])
+            ip_block = self.ip_regex.search(line)
+            if ip_block:
+                ip = ip_block.group().strip(' - -')
+                self.stats['unique_ip'].add(ip)
             self.stats['total_lines'] += 1
             self.stats['new_lines'] += 1
 
-            # Get a section count
-            # from a field formatted as :
-            # " /x/y/x"
-            # with a leading space
-            # Only keep the URI and drop the remaining variables
-            uri = fields[6].split('/')[2:]
+            # Get the URI
+            # Format is "CMD /section/subsections HTTP/{vers}'
+            # Drop CMD and split rest in list
+            uri = self.uri_regex.split(line)
+            if len(uri) >= 2:
+                uri_fields = self.section_regex.split(uri[1])
+                if len(uri_fields) >= 2:
+                    section = uri_fields[1].split('/')
 
-            if uri:
-                section = uri[0].split('?')[0]
-                if section not in self.top_section_hits.keys():
-                    self.top_section_hits[section] = 1
-                else:
-                    self.top_section_hits[section] += 1
+                    if len(section) >= 3:
+                        # Drop the trailing variables if they exist
+                        if '?' in section[2]:
+                            section[2] = section[2].split('?')[0]
+
+                        if section[2] not in self.top_section_hits.keys():
+                            self.top_section_hits[section[2]] = 1
+                        else:
+                            self.top_section_hits[section[2]] += 1
         # Calculate hits/min average for a two minute
         # sliding window
         if len(self.two_min_hits) != 12:
