@@ -89,6 +89,20 @@ class MonitorTests(unittest.TestCase):
         after = m.top_section_hits
         self.assertDictEqual(before, after)
 
+    def test_scan_log_incomplete_line(self):
+        '''
+        Verify that it behaves correctly on incomplete lines
+        '''
+
+        m = monitor.Monitor()
+        m.log = MagicMock()
+        m.log.readlines.return_value = [(
+             '121.17.198.11 - - [09/Jun/2017:15:35:07 +0200]/"')]
+        before = m.top_section_hits
+        m.scan_log(False)
+        after = m.top_section_hits
+        self.assertDictEqual(before, after)
+
     def test_redraw_screen_top_section(self):
 
         m = monitor.Monitor()
