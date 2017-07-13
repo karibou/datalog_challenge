@@ -74,6 +74,21 @@ class MonitorTests(unittest.TestCase):
         self.assertEquals(len(m.two_min_hits), 12)
         self.assertEquals(m.one_min_ave, 6)
 
+    def test_scan_log_without_section(self):
+        '''
+        Verify that no entry is added if there is no section found
+        '''
+
+        m = monitor.Monitor()
+        m.log = MagicMock()
+        m.log.readlines.return_value = [(
+             '121.17.198.11 - - [09/Jun/2017:15:35:07 +0200] '
+             '"GET /list HTTP/1.0" 200 5038 "http://cook.com/login/"')]
+        before = m.top_section_hits
+        m.scan_log(False)
+        after = m.top_section_hits
+        self.assertDictEqual(before, after)
+
     def test_redraw_screen_top_section(self):
 
         m = monitor.Monitor()
